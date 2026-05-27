@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import pickle
 import re
 import unicodedata
@@ -19,9 +20,14 @@ from typing import Optional
 
 log = logging.getLogger(__name__)
 
-# Repo layout: apps/agent-engine/app/agents/retrieval.py
+# Repo layout (local): apps/agent-engine/app/agents/retrieval.py
 # -> repo root cách đây 4 cấp.
-REPO_ROOT = Path(__file__).resolve().parents[4]
+# In container (Railway): /app/app/agents/retrieval.py -> fewer parents.
+# Use env var override or safe fallback.
+_file_parents = Path(__file__).resolve().parents
+REPO_ROOT = Path(os.environ["REPO_ROOT"]) if os.environ.get("REPO_ROOT") else (
+    _file_parents[4] if len(_file_parents) > 4 else _file_parents[-1]
+)
 KB_DIR = REPO_ROOT / "data" / "knowledge_base"
 
 
